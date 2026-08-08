@@ -1,8 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 
-// Using a local JSON file to simulate persistent storage on a stateful deployment (like Render/Railway).
-const DATA_DIR = path.join(process.cwd(), 'data');
+// Force absolute path for Railway production to avoid Next.js cwd resolving differences
+const DATA_DIR = process.env.NODE_ENV === 'production' 
+  ? '/app/data' 
+  : path.join(process.cwd(), 'data');
 const DATA_FILE = path.join(DATA_DIR, 'data.json');
 
 if (!fs.existsSync(DATA_DIR)) {
