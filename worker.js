@@ -25,7 +25,8 @@ async function runCycle() {
   
   const data = getAgentData();
   if (!data || !data.persona) {
-    console.log("No persona initialized yet. Sleeping...");
+    console.log("No persona initialized yet. Checking again in 1 minute...");
+    setTimeout(runCycle, 60 * 1000);
     return;
   }
 
@@ -81,13 +82,12 @@ async function runCycle() {
   } catch (error) {
     console.error("Cycle failed:", error);
   }
+
+  // Schedule next run in 2 hours
+  const INTERVAL_MS = 2 * 60 * 60 * 1000;
+  console.log(`Cycle complete. Sleeping for ${INTERVAL_MS / 1000 / 60} minutes.`);
+  setTimeout(runCycle, INTERVAL_MS);
 }
 
 // Run immediately once
 runCycle();
-
-// Then run every 2 hours (7200000 ms) 
-// (For hackathon testing purposes, you might want to lower this to 5 minutes: 300000)
-const INTERVAL_MS = 2 * 60 * 60 * 1000;
-console.log(`Worker started. Running every ${INTERVAL_MS / 1000 / 60} minutes.`);
-setInterval(runCycle, INTERVAL_MS);
