@@ -141,8 +141,8 @@ export default function Home() {
 
               {posts.length === 0 ? (
                 <div className="text-center py-20 border border-dashed border-neutral-800 rounded-2xl">
-                  <p className="text-neutral-500">Waiting for the background worker...</p>
-                  <p className="text-neutral-600 text-sm mt-2">Run `node worker.js` in your terminal to start the autonomous loop.</p>
+                  <p className="text-neutral-500 animate-pulse">The autonomous agent is scanning live feeds...</p>
+                  <p className="text-neutral-600 text-sm mt-2">Check the heartbeat monitor above. The first post will appear here automatically.</p>
                 </div>
               ) : (
                 <div className="space-y-6">
