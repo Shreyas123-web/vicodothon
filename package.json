@@ -8,8 +8,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "concurrently \"next start\" \"node worker.js\"",
-    "start:all": "concurrently \"next start\" \"node worker.js\"",
+    "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {

@@ -1,21 +1,7 @@
-// worker.js
-// This script runs autonomously. Run it with: node worker.js
-const fs = require('fs');
-const path = require('path');
-const Parser = require('rss-parser');
-
-// We use ts-node dynamically or just run compiled code, 
-// but since we want to run this in dev without pre-compiling all Next.js TS files, 
-// we will load the TS files using ts-node/register, or just require the functions.
-require('dotenv').config({ path: '.env.local' });
-
-require('ts-node').register({
-  compilerOptions: { module: 'commonjs' }
-});
-
-const { getAgentData, savePost, saveRejections, updateHeartbeat } = require('./src/lib/db.ts');
-const { evaluateHeadlines } = require('./src/lib/judge.ts');
-const { generatePostText } = require('./src/lib/voice.ts');
+import { getAgentData, savePost, saveRejections, updateHeartbeat } from '@/lib/db';
+import { evaluateHeadlines } from '@/lib/judge';
+import { generatePostText } from '@/lib/voice';
+import Parser from 'rss-parser';
 
 const parser = new Parser();
 const RSS_URL = 'https://techcrunch.com/feed/';
@@ -87,11 +73,16 @@ async function runCycle() {
     updateHeartbeat();
   }
 
-  // Schedule next run in 2 hours
-  const INTERVAL_MS = 2 * 60 * 60 * 1000;
+  // Schedule next run in 5 minutes
+  const INTERVAL_MS = 5 * 60 * 1000;
   console.log(`Cycle complete. Sleeping for ${INTERVAL_MS / 1000 / 60} minutes.`);
   setTimeout(runCycle, INTERVAL_MS);
 }
 
-// Run immediately once
-runCycle();
+export function register() {
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    // Kick off the autonomous loop when the Next.js Node server boots up
+    console.log("Next.js Instrumentation: Booting background autonomous loop...");
+    runCycle();
+  }
+}
