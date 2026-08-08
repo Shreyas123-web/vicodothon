@@ -20,6 +20,7 @@ export default function Home() {
   const [agentId, setAgentId] = useState<string | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [rejections, setRejections] = useState<RejectedTopic[]>([]);
+  const [lastRunAt, setLastRunAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const [name, setName] = useState("Ada");
@@ -49,6 +50,7 @@ export default function Home() {
       const res = await fetch(`/api/agent/feed?agentId=${agentId}`);
       const data = await res.json();
       if (data.posts) setPosts(data.posts);
+      if (data.lastRunAt) setLastRunAt(data.lastRunAt);
       
       const rRes = await fetch(`/api/agent/rejected?agentId=${agentId}`);
       const rData = await rRes.json();
@@ -75,10 +77,19 @@ export default function Home() {
             <p className="text-neutral-400 mt-2 text-sm">Real LLM Engine with Live RSS Discovery</p>
           </div>
           {agentId && (
-            <div className="text-right">
+            <div className="text-right flex flex-col items-end gap-2">
               <span className="text-xs font-mono bg-neutral-900 text-neutral-400 px-3 py-1 rounded-full border border-neutral-800">
                 ID: {agentId}
               </span>
+              {lastRunAt && (
+                <span className="text-xs font-mono text-emerald-400/80 flex items-center gap-2">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  Worker Last Active: {new Date(lastRunAt).toLocaleTimeString()}
+                </span>
+              )}
             </div>
           )}
         </header>

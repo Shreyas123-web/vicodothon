@@ -35,6 +35,7 @@ export interface AgentData {
   persona: Persona | null;
   posts: Post[];
   rejected: RejectedTopic[];
+  lastRunAt?: string;
 }
 
 function readData(): AgentData {
@@ -66,7 +67,8 @@ export function initAgent(persona: Persona): string {
     agentId,
     persona,
     posts: [],
-    rejected: []
+    rejected: [],
+    lastRunAt: new Date().toISOString()
   });
   return agentId;
 }
@@ -85,4 +87,12 @@ export function saveRejections(rejections: RejectedTopic[]) {
   const data = readData();
   data.rejected = [...rejections, ...data.rejected];
   writeData(data);
+}
+
+export function updateHeartbeat() {
+  const data = readData();
+  if (data.agentId) {
+    data.lastRunAt = new Date().toISOString();
+    writeData(data);
+  }
 }

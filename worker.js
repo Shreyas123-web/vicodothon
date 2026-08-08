@@ -13,7 +13,7 @@ require('ts-node').register({
   compilerOptions: { module: 'commonjs' }
 });
 
-const { getAgentData, savePost, saveRejections } = require('./src/lib/db.ts');
+const { getAgentData, savePost, saveRejections, updateHeartbeat } = require('./src/lib/db.ts');
 const { evaluateHeadlines } = require('./src/lib/judge.ts');
 const { generatePostText } = require('./src/lib/voice.ts');
 
@@ -78,9 +78,13 @@ async function runCycle() {
       console.log("No topics met the editorial bar this cycle. Agent is waiting.");
     }
 
+    // Update heartbeat to prove worker is alive
+    updateHeartbeat();
 
   } catch (error) {
     console.error("Cycle failed:", error);
+    // Still update heartbeat even if cycle fails, to show the loop hasn't crashed
+    updateHeartbeat();
   }
 
   // Schedule next run in 2 hours

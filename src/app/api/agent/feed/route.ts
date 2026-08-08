@@ -18,5 +18,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ posts: [] });
   }
 
-  return NextResponse.json({ posts: data.posts });
+  return NextResponse.json({ 
+    posts: data.posts,
+    lastRunAt: data.lastRunAt 
+  });
 }
