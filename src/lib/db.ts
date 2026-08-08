@@ -38,18 +38,23 @@ export interface AgentData {
 }
 
 function readData(): AgentData {
+  console.log(`[DB] Reading from exact path: ${DATA_FILE}`);
   if (!fs.existsSync(DATA_FILE)) {
+    console.log(`[DB] File not found at path. Returning empty state.`);
     return { agentId: '', persona: null, posts: [], rejected: [] };
   }
   try {
     const raw = fs.readFileSync(DATA_FILE, 'utf-8');
+    console.log(`[DB] Successfully read ${raw.length} bytes from file.`);
     return JSON.parse(raw);
   } catch (e) {
+    console.log(`[DB] Error parsing file:`, e);
     return { agentId: '', persona: null, posts: [], rejected: [] };
   }
 }
 
 function writeData(data: AgentData) {
+  console.log(`[DB] Writing to exact path: ${DATA_FILE}`);
   const tmpFile = `${DATA_FILE}.tmp`;
   fs.writeFileSync(tmpFile, JSON.stringify(data, null, 2), 'utf-8');
   fs.renameSync(tmpFile, DATA_FILE);
