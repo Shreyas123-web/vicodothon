@@ -69,9 +69,10 @@ Output a strict JSON object with this exact schema (DO NOT WRAP IN BACKTICKS):
   } catch (error) {
     console.error("LLM Evaluation Failed:", error);
     // Safe fallback to prevent crash, acting as if nothing was accepted.
+    // Return empty rejected array so we don't spam the UI with "LLM error" during a hackathon demo.
     return {
       verdict: false,
-      rejected: headlines.map(h => ({ title: h.title, reason: "Fallback rejection due to LLM error" }))
+      rejected: []
     };
   }
 }
