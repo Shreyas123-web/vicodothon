@@ -1,8 +1,13 @@
 import fs from 'fs';
 import path from 'path';
 
-// Using a local JSON file to simulate persistent storage on a stateful deployment (like Render).
-const DATA_FILE = path.join(process.cwd(), 'data.json');
+// Using a local JSON file to simulate persistent storage on a stateful deployment (like Render/Railway).
+const DATA_DIR = path.join(process.cwd(), 'data');
+const DATA_FILE = path.join(DATA_DIR, 'data.json');
+
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+}
 
 export interface Persona {
   name: string;

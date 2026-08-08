@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: vicodothon-agent
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:all
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+    disk:
+      name: agent-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1

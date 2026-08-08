@@ -23,10 +23,10 @@ export async function evaluateHeadlines(persona: Persona, headlines: Headline[],
   if (!process.env.GEMINI_API_KEY) {
     throw new Error("GEMINI_API_KEY is not set.");
   }
-
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({
-    model: 'deep-research-preview-04-2026',
+    model: 'gemini-flash-latest',
+    generationConfig: { responseMimeType: "application/json" }
   });
 
   const prompt = `

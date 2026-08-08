@@ -16,7 +16,6 @@ require('ts-node').register({
 const { getAgentData, savePost, saveRejections } = require('./src/lib/db.ts');
 const { evaluateHeadlines } = require('./src/lib/judge.ts');
 const { generatePostText } = require('./src/lib/voice.ts');
-const { logEpisodeToBreeth } = require('./src/lib/breeth.ts');
 
 const parser = new Parser();
 const RSS_URL = 'https://techcrunch.com/feed/';
@@ -78,13 +77,6 @@ async function runCycle() {
       console.log("No topics met the editorial bar this cycle. Agent is waiting.");
     }
 
-    // Fire-and-forget Breeth logging (outside the critical path)
-    const logContent = verdict.verdict
-      ? `Agent ACCEPTED topic: "${verdict.accepted.title}". Rationale: ${verdict.accepted.rationale}`
-      : `Agent REJECTED topics. Examples: ${verdict.rejected.slice(0, 3).map(r => r.title + " (" + r.reason + ")").join(', ')}`;
-    
-    // Do not await this. Let it run in the background.
-    logEpisodeToBreeth(logContent, persona.name).catch(() => {});
 
   } catch (error) {
     console.error("Cycle failed:", error);
