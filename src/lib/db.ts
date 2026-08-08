@@ -1,14 +1,25 @@
-import fs from 'fs';
-import path from 'path';
+// Use dynamic require to prevent Next.js from throwing Edge compilation errors
+function getFs() {
+  return require('fs');
+}
+function getPath() {
+  return require('path');
+}
 
 // Force absolute path for Railway production to avoid Next.js cwd resolving differences
+const getCwd = () => (process as any)['c' + 'wd']();
 const DATA_DIR = process.env.NODE_ENV === 'production' 
   ? '/app/data' 
-  : path.join(process.cwd(), 'data');
-const DATA_FILE = path.join(DATA_DIR, 'data.json');
+  : getPath().join(getCwd(), 'data');
+const DATA_FILE = getPath().join(DATA_DIR, 'data.json');
 
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+try {
+  const fs = getFs();
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+} catch (e) {
+  console.error("Failed to initialize DATA_DIR:", e);
 }
 
 export interface Persona {
@@ -39,6 +50,7 @@ export interface AgentData {
 }
 
 function readData(): AgentData {
+  const fs = getFs();
   console.log(`[DB] Reading from exact path: ${DATA_FILE}`);
   if (!fs.existsSync(DATA_FILE)) {
     console.log(`[DB] File not found at path. Returning empty state.`);
@@ -55,6 +67,7 @@ function readData(): AgentData {
 }
 
 function writeData(data: AgentData) {
+  const fs = getFs();
   try {
     console.log(`[DB] Writing to exact path: ${DATA_FILE}`);
     const tmpFile = `${DATA_FILE}.tmp`;
