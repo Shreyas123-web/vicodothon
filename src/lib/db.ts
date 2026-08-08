@@ -55,10 +55,14 @@ function readData(): AgentData {
 }
 
 function writeData(data: AgentData) {
-  console.log(`[DB] Writing to exact path: ${DATA_FILE}`);
-  const tmpFile = `${DATA_FILE}.tmp`;
-  fs.writeFileSync(tmpFile, JSON.stringify(data, null, 2), 'utf-8');
-  fs.renameSync(tmpFile, DATA_FILE);
+  try {
+    console.log(`[DB] Writing to exact path: ${DATA_FILE}`);
+    const tmpFile = `${DATA_FILE}.tmp`;
+    fs.writeFileSync(tmpFile, JSON.stringify(data, null, 2), 'utf-8');
+    fs.renameSync(tmpFile, DATA_FILE);
+  } catch (e) {
+    console.error(`[DB] Error writing to file:`, e);
+  }
 }
 
 export function initAgent(persona: Persona): string {
