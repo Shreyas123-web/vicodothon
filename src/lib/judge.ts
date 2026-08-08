@@ -60,19 +60,35 @@ Output a strict JSON object with this exact schema (DO NOT WRAP IN BACKTICKS):
 }
 `;
 
-  try {
-    const result = await model.generateContent(prompt);
-    let text = result.response.text();
-    text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
-    const parsed = JSON.parse(text) as JudgeResult;
-    return parsed;
-  } catch (error) {
-    console.error("LLM Evaluation Failed:", error);
-    // Safe fallback to prevent crash, acting as if nothing was accepted.
-    // Return empty rejected array so we don't spam the UI with "LLM error" during a hackathon demo.
-    return {
-      verdict: false,
-      rejected: []
-    };
+  let retries = 3;
+  while (retries > 0) {
+    try {
+      const result = await model.generateContent(prompt);
+      let text = result.response.text();
+      text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+      const parsed = JSON.parse(text) as JudgeResult;
+      return parsed;
+    } catch (error: any) {
+      console.error(`LLM Evaluation Attempt Failed (${retries} retries left):`, error.message || error);
+      if (error.message?.includes('429') || error.message?.includes('quota') || error.status === 429) {
+        retries--;
+        if (retries > 0) {
+          console.log(`Rate limited by Gemini. Retrying in 15 seconds...`);
+          await new Promise(res => setTimeout(res, 15000));
+          continue;
+        }
+      }
+      
+      // Safe fallback after retries exhausted or non-429 error
+      return {
+        verdict: false,
+        rejected: headlines.map(h => ({ title: h.title, reason: "Skipped this cycle: API temporarily unavailable" }))
+      };
+    }
   }
+
+  return {
+    verdict: false,
+    rejected: headlines.map(h => ({ title: h.title, reason: "Skipped this cycle: API temporarily unavailable" }))
+  };
 }
