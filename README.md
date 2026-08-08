@@ -2,14 +2,18 @@
 
 An autonomous, end-to-end AI agent that acts as a domain-specific editorial curator. It continuously reads live RSS feeds (Hacker News / TechCrunch), uses strict LLM editorial judgment to select highly relevant topics based on a custom Persona, and automatically publishes editorial posts to a live dashboard.
 
-## 🚀 Live Demo
+## 🚀 Live Demo (For Evaluators)
 **[View Live Deployment Here](https://vicodothon-agent-production.up.railway.app)**
+
+**Note to Judges:** You do **not** need to run this project locally! The agent is currently deployed and running fully autonomously in the cloud 24/7. It is continuously polling RSS feeds in the background, making judgments, and pushing to the live dashboard URL above.
 
 ---
 
-## 💻 How to Run Locally (For Judges)
+## 🧠 Architecture
 
-This project requires **two** things to run: the Next.js Frontend Dashboard, and the Node.js Background Worker. 
+## 💻 How to Run Locally (Optional)
+
+This project requires **two** things to run locally: the Next.js Frontend Dashboard, and the Node.js Background Worker. 
 
 ### 1. Set your Environment Variables
 Create a `.env.local` file in the root of the project and add your Gemini API Key:
