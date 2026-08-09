@@ -34,6 +34,11 @@ Domain: ${persona.domain}
 Your job is to review a list of recent headlines and select EXACTLY ONE (or none) that is highly relevant to this persona and worthy of publishing.
 You must exercise strict editorial judgment. Reject generic news, irrelevant topics, or topics we have already published about.
 
+CRITICAL RULES:
+1. If a headline covers a topic or event that is in the "Past topics" list, you MUST reject it.
+2. If ALL headlines are either irrelevant, generic, or already covered, you MUST output "verdict": false and reject all of them. Do not force an acceptance.
+3. If you select a headline for "accepted", you MUST NOT include it in the "rejected" array.
+
 Past topics we have already published (DO NOT REPEAT THESE):
 ${pastTopics.length > 0 ? pastTopics.map(t => '- ' + t).join('\n') : 'None yet.'}
 
@@ -42,7 +47,7 @@ ${headlines.map((h, i) => `[${i}] ${h.title} (URL: ${h.link})`).join('\n')}
 
 Output a strict JSON object with this exact schema (DO NOT WRAP IN BACKTICKS):
 {
-  "verdict": boolean, // true if you selected a headline, false if you rejected all of them
+  "verdict": boolean, // true if you selected a new, relevant headline. false if you rejected all of them.
   "accepted": { // omit if verdict is false
     "title": "exact title of selected headline",
     "rationale": "A 2-3 sentence explanation of why this topic was selected, why it is relevant now, and why it was chosen over the others.",
@@ -51,7 +56,7 @@ Output a strict JSON object with this exact schema (DO NOT WRAP IN BACKTICKS):
   "rejected": [ // list all headlines that were NOT selected
     {
       "title": "exact title",
-      "reason": "1 sentence harsh critique of why this was rejected by the persona (e.g. 'Too generic', 'Already covered', 'Irrelevant to domain')."
+      "reason": "1 sentence harsh critique of why this was rejected (e.g. 'Too generic', 'Already covered', 'Irrelevant')."
     }
   ]
 }

@@ -30,7 +30,7 @@ export async function register() {
             link: item.link || 'https://news.ycombinator.com'
           }));
 
-          const pastTopics = data.posts.map((p: any) => p.rationale);
+          const pastTopics = data.posts.map((p: any) => p.text);
 
           console.log("Judging headlines...");
           const judgeResult = await evaluateHeadlines(data.persona, headlines, pastTopics);
