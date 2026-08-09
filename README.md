@@ -8,15 +8,16 @@ An autonomous, end-to-end AI agent that acts as a domain-specific editorial cura
 ## 🚀 Live Demo (For Evaluators)
 **[View Live Deployment Here](https://vicodothon-agent-production.up.railway.app)**
 
-**Note to Judges:** You do **not** need to run this project locally! The agent is currently deployed and running fully autonomously in the cloud 24/7. It is continuously polling RSS feeds in the background, making judgments, and pushing to the live dashboard URL above.
+**Note to Judges:** You do **not** need to run this project locally! The agent is currently deployed and running autonomously on a scheduled cycle (currently every 3 hours), publishing new posts without manual intervention.
 
 ---
 
 ## 🧠 Architecture
 - **Frontend/Backend**: Next.js 16+ App Router
 - **Autonomous Worker**: Next.js `instrumentation.ts` background loop that runs entirely detached from the UI.
-- **AI Integration**: Groq SDK using the `llama-3.3-70b-versatile` model with strict `json_object` response formatting for flawless parsing.
-- **Memory**: Persistent JSON file-based database (`/app/data/data.json`) mounted to a cloud volume for total state recovery.
+- **AI Integration**: Groq SDK using the `llama-3.3-70b-versatile` model with structured `json_object` response formatting for reliable parsing.
+- **Memory**: Persistent JSON file-based database (`/app/data/data.json`) mounted to a cloud volume. Persistent across redeploys, verified via testing.
+- **Editorial Deduplication**: A code-level programmatic backstop deduplicates and rejects normalized URLs to prevent republishing, while persistent memory stores a detailed rejection log outlining exactly why the LLM discarded specific topics.
 
 ## 💻 How to Run Locally (Optional)
 
@@ -46,7 +47,9 @@ Open [http://localhost:3000](http://localhost:3000) in your browser. You will be
 
 This project was built with the assistance of advanced AI coding agents. Specifically, AI was used for:
 
-1. **System Architecture & Constraints:** Diagnosing edge-case constraints in the Next.js Edge Runtime, bypassing static analyzer restrictions to enable persistent file-system (fs) writing in a Serverless environment.
+1. **System Architecture & Constraints:** Diagnosing edge-case constraints in the Next.js Edge Runtime, bypassing static analyzer restrictions to enable persistent file-system (fs) writing in a standard Node.js container environment.
 2. **Resilience Engineering:** Designing the background autonomous loop inside Next.js `instrumentation.ts` rather than relying on external cron jobs, and engineering robust retry-with-backoff logic for API rate limits.
 3. **Migration & Provider Swapping:** Writing the `judge.ts` LLM prompt engineering, enforcing strict JSON schemas, and migrating the backend logic from Google Gemini to Groq Llama-3 to resolve hackathon rate-limit bottlenecks.
 4. **UI/UX Design:** Assisting with the TailwindCSS structure and React `useEffect` polling logic for the live dashboard's heartbeat monitor.
+
+**Note on Development History:** The bullets above describe the finalized architecture. For the complete, unedited development transcript documenting the rate-limit debugging, key rotation incident, and duplicate-post bugs we overcame, see `PROMPTS.md` and `TRANSCRIPT.jsonl` in this repository.
