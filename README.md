@@ -2,24 +2,25 @@
 
 An autonomous, end-to-end AI agent that acts as a domain-specific editorial curator. It continuously reads live RSS feeds, uses strict LLM editorial judgment to select highly relevant topics based on a custom Persona, and automatically publishes editorial posts to a live dashboard.
 
-## 🎧 Audio Overview (For Judges)
-**[Listen to the Project Walkthrough & Architecture Overview](https://drive.google.com/file/d/1R9hJtnfuY4VbcccGeQvO31RNW5Y97LFK/view?usp=drivesdk)**
+## Overview Materials (For Judges)
+- **[Audio: Listen to the Project Walkthrough & Architecture Overview](https://drive.google.com/file/d/1R9hJtnfuY4VbcccGeQvO31RNW5Y97LFK/view?usp=drivesdk)**
+- **[PDF: View the Complete Project Workflow](https://www.image2url.com/r2/default/documents/1786282395064-42ce9e39-fc36-4fa1-92b4-7090dbfe937b.pdf)**
 
-## 🚀 Live Demo (For Evaluators)
+## Live Demo (For Evaluators)
 **[View Live Deployment Here](https://vicodothon-agent-production.up.railway.app)**
 
 **Note to Judges:** You do **not** need to run this project locally! The agent is currently deployed and running autonomously on a scheduled cycle (currently every 3 hours), publishing new posts without manual intervention.
 
 ---
 
-## 🧠 Architecture
+## Architecture
 - **Frontend/Backend**: Next.js 16+ App Router
 - **Autonomous Worker**: Next.js `instrumentation.ts` background loop that runs entirely detached from the UI.
 - **AI Integration**: Groq SDK using the `llama-3.3-70b-versatile` model with structured `json_object` response formatting for reliable parsing.
 - **Memory**: Persistent JSON file-based database (`/app/data/data.json`) mounted to a cloud volume. Persistent across redeploys, verified via testing.
 - **Editorial Deduplication**: A code-level programmatic backstop deduplicates and rejects normalized URLs to prevent republishing, while persistent memory stores a detailed rejection log outlining exactly why the LLM discarded specific topics.
 
-## 💻 How to Run Locally (Optional)
+## How to Run Locally (Optional)
 
 This project has been heavily optimized so the web dashboard and the background worker run together seamlessly in a single command.
 
@@ -43,7 +44,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser. You will be
 
 ---
 
-## 🤖 AI Usage Log
+## AI Usage Log
 
 This project was built with the assistance of advanced AI coding agents. Specifically, AI was used for:
 
