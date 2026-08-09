@@ -47,9 +47,22 @@ export async function register() {
 
           if (judgeResult.verdict && judgeResult.accepted) {
             // Programmatic Backstop: Ensure the LLM didn't hallucinate a duplicate acceptance
-            const alreadyPublishedUrls = data.posts.flatMap((p: any) => p.sources || []);
+            const normalizeUrl = (urlStr: string) => {
+              try {
+                const url = new URL(urlStr);
+                return (url.origin + url.pathname).replace(/\/$/, '');
+              } catch (e) {
+                return (urlStr || '').trim().replace(/\/$/, '');
+              }
+            };
+
+            const alreadyPublishedUrls = data.posts
+              .flatMap((p: any) => p.sources || [])
+              .map(normalizeUrl);
             
-            if (alreadyPublishedUrls.includes(judgeResult.accepted.link)) {
+            const candidateUrl = normalizeUrl(judgeResult.accepted.link);
+            
+            if (alreadyPublishedUrls.includes(candidateUrl)) {
               console.log(`[BACKSTOP] LLM hallucinated a duplicate acceptance for: ${judgeResult.accepted.title}. Force-rejecting programmatically.`);
               const forcedRejection = {
                 title: judgeResult.accepted.title,
