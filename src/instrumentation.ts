@@ -46,19 +46,32 @@ export async function register() {
           }
 
           if (judgeResult.verdict && judgeResult.accepted) {
-            console.log(`Topic accepted: ${judgeResult.accepted.title}`);
-            const text = generatePostText(data.persona, judgeResult.accepted.title);
+            // Programmatic Backstop: Ensure the LLM didn't hallucinate a duplicate acceptance
+            const alreadyPublishedUrls = data.posts.flatMap((p: any) => p.sources || []);
             
-            const newPost = {
-              id: `post_${Date.now()}`,
-              createdAt: new Date().toISOString(),
-              text: text,
-              rationale: judgeResult.accepted.rationale,
-              sources: [judgeResult.accepted.link]
-            };
+            if (alreadyPublishedUrls.includes(judgeResult.accepted.link)) {
+              console.log(`[BACKSTOP] LLM hallucinated a duplicate acceptance for: ${judgeResult.accepted.title}. Force-rejecting programmatically.`);
+              const forcedRejection = {
+                title: judgeResult.accepted.title,
+                reason: "Programmatic Backstop: Already published this URL in a previous cycle.",
+                rejectedAt: new Date().toISOString()
+              };
+              saveRejections([forcedRejection]);
+            } else {
+              console.log(`Topic accepted: ${judgeResult.accepted.title}`);
+              const text = generatePostText(data.persona, judgeResult.accepted.title);
+              
+              const newPost = {
+                id: `post_${Date.now()}`,
+                createdAt: new Date().toISOString(),
+                text: text,
+                rationale: judgeResult.accepted.rationale,
+                sources: [judgeResult.accepted.link]
+              };
 
-            savePost(newPost);
-            console.log("Post published successfully!");
+              savePost(newPost);
+              console.log("Post published successfully!");
+            }
           } else {
             console.log("No topics met the editorial bar this cycle. Agent is waiting.");
           }
