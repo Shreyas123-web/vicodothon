@@ -97,4 +97,24 @@ The AI updated the Groq API call to use the `llama-3.3-70b-versatile` model (aft
 ```
 
 ---
+
+## Phase 6: The LLM Memory Hallucination & Code-Level Backstop
+**Prompt 9:**
+> "I just let the agent run on a 3-hour interval for 6 hours. It published two posts, but they were about the EXACT SAME TechCrunch article about Google's hacker hunter! Wait, why did it publish it twice? It even put it in the Rejected log saying 'Already covered'."
+
+**AI Output/Action:**
+The AI performed a deep analysis of the LLM's behavioral output and the `instrumentation.ts` data mapping. It discovered two flaws:
+1. The memory context being fed to the LLM only contained the *rationale* of past posts, not the actual generated text containing the specific title.
+2. When faced with an RSS feed where all other articles were completely irrelevant, the LLM correctly flagged the matching article in its `rejected` array, but hallucinated a duplicate entry in its `accepted` array to fulfill the prompt's request for a relevant topic.
+
+**Prompt 10:**
+> "A prompt-level 'CRITICAL RULES' instruction is a soft constraint on an LLM, not a hard guarantee. Add a code-level backstop to check whether the accepted title already exists in the memory list, and force-reject it programmatically."
+
+**AI Output/Action:**
+The AI added a rigorous, deterministic backstop to the backend:
+1. In `judge.ts`, it strengthened the prompt with explicit negative constraints to prevent duplicate acceptance.
+2. In `instrumentation.ts`, it built a URL normalizer (stripping trailing slashes and query parameters like `?utm_source`). 
+3. It implemented a strict programmatic gate: if the LLM's chosen URL semantically matches any previously published URL, the backend intercepts it, overrides the LLM, logs a `[BACKSTOP]` rejection to the persistent database, and prevents the duplicate publication.
+
+---
 *End of Log. The full, redacted conversation transcript verifying these prompts is available in `TRANSCRIPT.jsonl` in this repository.*
