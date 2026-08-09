@@ -70,7 +70,7 @@ export async function register() {
           updateHeartbeat();
         }
 
-        const INTERVAL_MS = 60 * 60 * 1000;
+        const INTERVAL_MS = 3 * 60 * 60 * 1000;
         console.log(`Cycle complete. Sleeping for ${INTERVAL_MS / 1000 / 60} minutes.`);
         setTimeout(runCycle, INTERVAL_MS);
       }
