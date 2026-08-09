@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Groq from 'groq-sdk';
 import { Persona } from './db';
 
 export interface Headline {
@@ -20,14 +20,11 @@ export interface JudgeResult {
 }
 
 export async function evaluateHeadlines(persona: Persona, headlines: Headline[], pastTopics: string[]): Promise<JudgeResult> {
-  if (!process.env.GEMINI_API_KEY) {
-    throw new Error("GEMINI_API_KEY is not set.");
+  if (!process.env.GROQ_API_KEY) {
+    throw new Error("GROQ_API_KEY is not set.");
   }
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-flash-latest',
-    generationConfig: { responseMimeType: "application/json" }
-  });
+  
+  const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
   const prompt = `
 You are an editorial judge for an AI agent. The agent's persona is:
@@ -63,17 +60,22 @@ Output a strict JSON object with this exact schema (DO NOT WRAP IN BACKTICKS):
   let retries = 3;
   while (retries > 0) {
     try {
-      const result = await model.generateContent(prompt);
-      let text = result.response.text();
+      const chatCompletion = await groq.chat.completions.create({
+        messages: [{ role: 'user', content: prompt }],
+        model: 'llama3-70b-8192',
+        response_format: { type: 'json_object' }
+      });
+      
+      let text = chatCompletion.choices[0]?.message?.content || '{}';
       text = text.replace(/```json/gi, '').replace(/```/g, '').trim();
       const parsed = JSON.parse(text) as JudgeResult;
       return parsed;
     } catch (error: any) {
       console.error(`LLM Evaluation Attempt Failed (${retries} retries left):`, error.message || error);
-      if (error.message?.includes('429') || error.message?.includes('quota') || error.status === 429) {
+      if (error.message?.includes('429') || error.message?.includes('rate limit') || error.status === 429) {
         retries--;
         if (retries > 0) {
-          console.log(`Rate limited by Gemini. Retrying in 15 seconds...`);
+          console.log(`Rate limited by Groq. Retrying in 15 seconds...`);
           await new Promise(res => setTimeout(res, 15000));
           continue;
         }
