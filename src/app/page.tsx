@@ -50,7 +50,10 @@ export default function Home() {
       const res = await fetch(`/api/agent/feed?agentId=${agentId}`);
       const data = await res.json();
       if (data.posts) setPosts(data.posts);
-      if (data.lastRunAt) setLastRunAt(data.lastRunAt);
+      
+      const sRes = await fetch(`/api/agent/status?agentId=${agentId}`);
+      const sData = await sRes.json();
+      if (sData.lastRunAt) setLastRunAt(sData.lastRunAt);
       
       const rRes = await fetch(`/api/agent/rejected?agentId=${agentId}`);
       const rData = await rRes.json();

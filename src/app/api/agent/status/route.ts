@@ -15,10 +15,10 @@ export async function GET(request: Request) {
   const data = getAgentData();
 
   if (data.agentId !== agentId) {
-    return NextResponse.json({ posts: [] });
+    return NextResponse.json({ lastRunAt: null });
   }
 
   return NextResponse.json({ 
-    posts: data.posts
+    lastRunAt: data.lastRunAt 
   });
 }
